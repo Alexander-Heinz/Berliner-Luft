@@ -1,0 +1,39 @@
+# General
+.DS_Store
+*.pyc
+__pycache__/
+*.zip
+*.log
+Thumbs.db
+legacy/
+
+
+# Environment/credentials
+.env
+.env.*
+!.env.example  # Keep this if you have a non-sensitive example file
+*.tfvars
+terraform.rc
+.terraformrc
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate.backup
+.terraform.lock.hcl
+
+# Python
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+
+# IDE-specific
+.vscode/
+.idea/
+
+# Local scripts/configs (optional)
+*.local
+*.bak

@@ -74,3 +74,31 @@ If time runs short:
 * Document planned improvements
 * Include architecture diagrams for future state
 * Show working core solution
+
+
+
+## cloud deployment
+
+#### using terraform
+
+This was quite new to me. 
+
+I created the main.tf for all the relevant information to deploy my project in the cloud:
+
+- storage bucket details
+- required APIs
+- dataset (bigquery table) name
+- clustering & partitioning information
+- table schema
+- cron information about the scheduler job
+- the information about my invoker function.
+
+
+#### zip functions and upload to gcloud
+To work, my local functions have to be uploaded to the cloud.
+- use `zip_function_upload_gcloud.sh` to zip the `src` folder and upload it to gcloud.
+- `cd terraform` and use `terraform apply -var="project_id=berliner-luft-dez"` to upload / push the changes to the cloud
+
+
+
+

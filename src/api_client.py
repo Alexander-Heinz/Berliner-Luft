@@ -1,6 +1,6 @@
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 class LuftdatenAPIClient:
     BASE_URL = "https://www.umweltbundesamt.de/api/air_data/v3/"
@@ -31,14 +31,17 @@ class LuftdatenAPIClient:
         return self._get_data("scopes/json")
     
     def get_measures(self, component_id, station_id, hours_back=24):
-        now = datetime.utcnow()
-        params = {
-            'date_from': (now - timedelta(hours=hours_back)).strftime('%Y-%m-%d'),
-            'time_from': '0',
-            'date_to': now.strftime('%Y-%m-%d'),
-            'time_to': now.strftime('%H'),
-            'station': str(station_id),
-            'component': str(component_id),
-            'scope': '2'
-        }
+        try:
+            now = datetime.now(timezone.utc)
+            params = {
+                'date_from': (now - timedelta(hours=hours_back)).strftime('%Y-%m-%d'),
+                'time_from': '0',
+                'date_to': now.strftime('%Y-%m-%d'),
+                'time_to': now.strftime('%H'),
+                'station': str(station_id),
+                'component': str(component_id),
+                'scope': '2'
+            }
+        except Exception as e:
+            raise ValueError("Invalid parameters for getting measures") from e
         return self._get_data("measures/json", params)  # Note v3 in endpoint

@@ -1,2 +1,2 @@
 project_id = "berliner-luft-dez"
-region     = "europe-west10"  
+region     = "europe-west3"  
