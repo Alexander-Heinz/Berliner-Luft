@@ -5,10 +5,25 @@ Real-time air quality data pipeline for Berlin, ingesting data from Umweltbundes
 ## Architecture
 
 ```mermaid
-graph LR
-    A[Umweltbundesamt API] -->|Python| B[GCS Bucket]
-    B -->|Terraform| C[Infrastructure]
+graph TD
+    A[Umweltbundesamt API] --> B[Cloud Function]
+    B --> C[GCS Raw Storage]
+    B --> D[BigQuery]
+    D --> E[Looker Studio Dashboard]
+    F[Cloud Scheduler] --> B
 ```
+
+## Features
+- Hourly data collection
+
+- Automated pipeline with Terraform
+
+- Error-retry mechanisms
+
+- Hive-style partitioned storage
+
+- Using v3 of the Umweltbundesamt air data quality API: https://www.umweltbundesamt.de/daten/luft/luftdaten/
+
 
 ## Prerequisites
 Python 3.9+
@@ -80,6 +95,11 @@ GCS_BUCKET_NAME="berliner-luft"
 GCP_PROJECT_ID="your-project-id"
 ```
 
+## to test locally
+run 
+`functions-framework --target=main`
+
+`curl -X POST http://localhost:8080`
 
 ## Future Enhancements
 - Add BigQuery integration
