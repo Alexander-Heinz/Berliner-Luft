@@ -2,7 +2,7 @@
 
 Daily updated air quality data pipeline for Berlin, ingesting data from Umweltbundesamt API into Google Cloud Storage.
 
-![](assets/20250405_185845_dashboard.png)
+![](assets/dashboard.png)
 
 ## Architecture
 
