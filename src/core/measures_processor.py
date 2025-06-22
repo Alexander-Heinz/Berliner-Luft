@@ -9,6 +9,7 @@ from services.api_client import LuftdatenAPIClient
 from services.bigquery_client import BigQueryClient
 from utils.time_utils import parse_airquality_timestamp
 
+
 class MeasuresProcessor:
     def __init__(self, api_client: LuftdatenAPIClient,
                  gcs: GCSUploader, bq: BigQueryClient):

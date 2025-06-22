@@ -74,10 +74,41 @@ resource "google_bigquery_table" "raw_measures" {
 EOF
 }
 
+resource "google_bigquery_table" "dim_stations" {
+  dataset_id          = google_bigquery_dataset.airquality.dataset_id
+  table_id            = "dim_stations"
+  deletion_protection = false
+
+  schema = <<EOF
+[
+  { "name": "station_id", "type": "INTEGER" },
+  { "name": "name",       "type": "STRING"  },
+  { "name": "longitude",  "type": "FLOAT"   },
+  { "name": "latitude",   "type": "FLOAT"   }
+]
+EOF
+}
+
+resource "google_bigquery_table" "dim_components" {
+  dataset_id = google_bigquery_dataset.airquality.dataset_id
+  table_id   = "dim_components"
+  deletion_protection = false
+
+  schema = <<EOF
+[
+  {"name": "id", "type": "INTEGER"},
+  {"name": "code", "type": "STRING"},
+  {"name": "symbol", "type": "STRING"},
+  {"name": "unit", "type": "STRING"},
+  {"name": "name", "type": "STRING"}
+]
+EOF
+}
+
 # Cloud Function
 resource "google_cloudfunctions_function" "ingestor" {
   name                  = "airquality-ingestor"
-  region                = "europe-west3"  # Supported region
+  region                = "europe-west3"  
   runtime               = "python310"
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.berliner_luft.name
@@ -94,7 +125,7 @@ resource "google_cloud_scheduler_job" "daily_ingestion" {
   name        = "daily-airquality-ingestion"
   schedule    = "0 0 * * *"
   time_zone   = "Europe/Berlin"
-  region      = "europe-west3"  # Explicit region
+  region      = "europe-west3"  
 
   http_target {
     http_method = "POST"

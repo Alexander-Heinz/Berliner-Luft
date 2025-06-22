@@ -24,19 +24,23 @@ def main(request):
     except Exception as e:
         return json_error_response(e)
 
+
 def process_dimensions(api, gcs, bq):
     """Process dimension tables"""
     DimensionManager(api, gcs, bq).process_dimensions()
 
+
 def process_measures(api, gcs, bq) -> int:
     """Process measures data"""
     return MeasuresProcessor(api, gcs, bq).process_measures()
+
 
 def json_success_response(success_count: int):
     return jsonify({
         "status": "success",
         "components_processed": success_count
     }), 200
+
 
 def json_error_response(error: Exception):
     logging.exception("Critical error:")

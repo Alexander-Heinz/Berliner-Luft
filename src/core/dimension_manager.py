@@ -8,6 +8,10 @@ from services.gcs_uploader import GCSUploader
 from services.api_client import LuftdatenAPIClient
 from services.bigquery_client import BigQueryClient
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
 class DimensionManager:
     def __init__(self, api_client: LuftdatenAPIClient, 
                  gcs: GCSUploader, bq: BigQueryClient):
@@ -43,7 +47,8 @@ class DimensionManager:
         """Transform and load dimension data to BigQuery"""
         transformer = getattr(DataTransformer, f"transform_{entity}")
         rows = transformer(data)
-        
+        # logging.info(f"Transformed rows: {rows}")  # Check field names
+
         if not rows:
             logging.warning(f"No rows to load for {entity}")
             return
