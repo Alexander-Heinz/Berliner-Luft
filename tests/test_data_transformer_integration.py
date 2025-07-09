@@ -1,16 +1,6 @@
+from services.api_client import LuftdatenAPIClient
+from core.data_transformer import DataTransformer
 import pytest
-import sys
-import os
-
-# Setup paths so imports work:
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SRC_ROOT = os.path.join(PROJECT_ROOT, "src")
-
-sys.path.insert(0, PROJECT_ROOT)
-sys.path.insert(0, SRC_ROOT)
-
-from src.services.api_client import LuftdatenAPIClient
-from src.core.data_transformer import DataTransformer
 
 
 @pytest.mark.integration
@@ -33,21 +23,45 @@ def test_integration_transform_components():
 
 
 @pytest.mark.integration
-def test_integration_transform_stations():
+def test_transform_stations_end_to_end():
     client = LuftdatenAPIClient()
+
+    # Fetch raw data
     raw_stations = client.get_stations()
-    assert isinstance(raw_stations, dict)
-    processed = DataTransformer.transform_stations(raw_stations)
-    assert isinstance(processed, list)
-    assert len(processed) > 0
-    
-    for item in processed:
-        assert isinstance(item["station_id"], int)
-        assert isinstance(item["name"], str)
-        lon = item["longitude"]
-        lat = item["latitude"]
-        assert lon is None or isinstance(lon, float)
-        assert lat is None or isinstance(lat, float)
+    assert isinstance(raw_stations, dict), "Expected raw API response to be a dict"
+
+    # Transform
+    transformed = DataTransformer.transform_stations(raw_stations)
+    assert isinstance(transformed, list), "transform_stations should return a list"
+    assert len(transformed) > 0, "Expected at least one station in the result"
+
+    expected_keys = {"station_id", "name", "latitude", "longitude"}
+
+    for station in transformed:
+        # 1) Exactly the right keys
+        assert set(station.keys()) == expected_keys, f"Station dict keys mismatch: {station.keys()}"
+
+        # 2) station_id must be an int and > 0
+        sid = station["station_id"]
+        assert isinstance(sid, int), "station_id must be an int"
+        assert sid > 0, "station_id should be positive"
+
+        # 3) name must be a non-empty string
+        name = station["name"]
+        assert isinstance(name, str), "name must be a string"
+        assert name.strip() != "", "name should not be empty"
+
+        # 4) latitude and longitude must be floats or None
+        lat = station["latitude"]
+        lon = station["longitude"]
+        assert (isinstance(lat, float) or lat is None), "latitude must be float or None"
+        assert (isinstance(lon, float) or lon is None), "longitude must be float or None"
+
+        # 5) If present, lat/lon must be within valid ranges
+        if lat is not None and lon is not None:
+            assert -90.0 <= lat <= 90.0, f"latitude {lat} out of range"
+            assert -180.0 <= lon <= 180.0, f"longitude {lon} out of range"
+
 
 @pytest.mark.integration
 def test_integration_transform_scopes():

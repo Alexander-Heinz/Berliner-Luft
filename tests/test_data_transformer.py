@@ -1,16 +1,36 @@
+from core.data_transformer import DataTransformer
+from config.constants import CONFIG
 import pytest
-import sys
-import os
 
-# Ensure src is in the path
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SRC_ROOT = os.path.join(PROJECT_ROOT, "src")
+# This sample mirrors exactly what's in your GCS JSON dump
+_SAMPLE = {
+    "count": 12,
+    "indices": ["0: Id - string", "1: Code - string", "2: Symbol - string", "3: Unit - string", "4: Translated name - string"],
+    "PM10": ["1", "PM10", "PM\u2081\u2080", "\u00b5g/m\u00b3", "Feinstaub"],
+    "CO": ["2", "CO", "CO", "mg/m\u00b3", "Kohlenmonoxid"],
+    # …etc…
+}
 
-sys.path.insert(0, PROJECT_ROOT)
-sys.path.insert(0, SRC_ROOT)
 
-from src.core.data_transformer import DataTransformer
-from src.config.constants import CONFIG
+def test_transform_components_excludes_meta_keys():
+    rows = DataTransformer.transform_components(_SAMPLE)
+
+    # 1) We never get one of the excluded keys back
+    codes = [r["code"] for r in rows]
+    for bad in CONFIG["excluded_component_keys"]:
+        assert bad not in codes, f"{bad} should be excluded"
+
+    # 2) We get exactly len(SAMPLE) - len(excluded) rows
+    expected = len(_SAMPLE) - len(CONFIG["excluded_component_keys"])
+    assert len(rows) == expected
+
+    # 3) And each row has the right types
+    for row in rows:
+        assert isinstance(row["id"], int)
+        assert isinstance(row["code"], str)
+        assert isinstance(row["symbol"], str)
+        assert isinstance(row["unit"], str)
+        assert isinstance(row["name"], str)
 
 
 def test_transform_components_excludes_keys():

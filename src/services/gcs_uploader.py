@@ -1,10 +1,10 @@
 import json
 from google.cloud import storage
 from google.api_core.exceptions import GoogleAPIError
-from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class GCSUploader:
     def __init__(self, bucket_name):
@@ -20,6 +20,7 @@ class GCSUploader:
                 content_type='application/json'
             )
             logger.info(f"Uploaded {destination_blob_name} to GCS")
+            # logger.info("Sample transformed record: %s", json.dumps(data))
             return True
         except GoogleAPIError as e:
             logger.error(f"GCS upload failed: {str(e)}")

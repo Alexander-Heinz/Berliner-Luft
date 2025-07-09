@@ -1,15 +1,8 @@
-# tests/test_api_client.py
-
+from services.api_client import LuftdatenAPIClient
 import pytest
 import requests
-from unittest.mock import MagicMock
-import sys
-import os
 from tenacity import RetryError
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.services.api_client import LuftdatenAPIClient
 
 class DummyResponse:
     """
@@ -30,6 +23,7 @@ class DummyResponse:
     def json(self):
         return self._data
 
+
 def test_get_components_success(monkeypatch):
     client = LuftdatenAPIClient()
     dummy_payload = {"components": [{"id": 1, "name": "PM10"}]}
@@ -42,6 +36,7 @@ def test_get_components_success(monkeypatch):
     client.session.get = fake_get
     result = client.get_components()
     assert result == dummy_payload
+
 
 def test_get_stations_success(monkeypatch):
     client = LuftdatenAPIClient()
@@ -56,6 +51,7 @@ def test_get_stations_success(monkeypatch):
     result = client.get_stations()
     assert result == dummy_payload
 
+
 def test_get_scopes_success(monkeypatch):
     client = LuftdatenAPIClient()
     dummy_payload = {"scopes": [{"id": 2, "description": "Outdoor"}]}
@@ -68,6 +64,7 @@ def test_get_scopes_success(monkeypatch):
     client.session.get = fake_get
     result = client.get_scopes()
     assert result == dummy_payload
+
 
 def test_get_measures_success(monkeypatch):
     client = LuftdatenAPIClient()
@@ -101,6 +98,7 @@ def test_get_measures_success(monkeypatch):
     result = client.get_measures(component_id=5, station_id=7, hours_back=24)
     assert result == dummy_payload
 
+
 def test_get_measures_invalid_hours_back_raises_value_error():
     client = LuftdatenAPIClient()
 
@@ -108,6 +106,7 @@ def test_get_measures_invalid_hours_back_raises_value_error():
         client.get_measures(component_id=1, station_id=1, hours_back="not_an_int")
 
     assert "Invalid parameters for getting measures" in str(excinfo.value)
+
 
 def test_get_components_http_error(monkeypatch):
     client = LuftdatenAPIClient()
@@ -136,6 +135,7 @@ def test_get_measures_http_error(monkeypatch):
 
     assert isinstance(excinfo.value.last_attempt.exception(), requests.HTTPError)
 
+
 def test_get_measures_retry_error(monkeypatch):
     client = LuftdatenAPIClient()
 
@@ -146,6 +146,7 @@ def test_get_measures_retry_error(monkeypatch):
 
     with pytest.raises(RetryError):
         client.get_measures(component_id=5, station_id=7, hours_back=24)
+
 
 def test_get_components_retry_error(monkeypatch):
     client = LuftdatenAPIClient()
@@ -158,6 +159,7 @@ def test_get_components_retry_error(monkeypatch):
     with pytest.raises(RetryError):
         client.get_components()
 
+
 def test_get_stations_retry_error(monkeypatch):
     client = LuftdatenAPIClient()
 
@@ -168,6 +170,7 @@ def test_get_stations_retry_error(monkeypatch):
 
     with pytest.raises(RetryError):
         client.get_stations()
+
 
 def test_get_scopes_retry_error(monkeypatch):
     client = LuftdatenAPIClient()

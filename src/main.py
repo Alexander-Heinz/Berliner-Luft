@@ -14,7 +14,8 @@ def main(request):
     try:
         api = LuftdatenAPIClient()
         gcs = GCSUploader(constants.CONFIG["gcs_bucket"])
-        bq = BigQueryClient(constants.CONFIG["bq_dataset"])
+        bq = BigQueryClient(project=constants.CONFIG["project"],
+                            dataset_id=constants.CONFIG["bq_dataset"])
 
         process_dimensions(api, gcs, bq)
         success_count = process_measures(api, gcs, bq)

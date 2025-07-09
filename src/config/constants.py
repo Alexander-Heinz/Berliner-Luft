@@ -5,6 +5,7 @@ load_dotenv()
 
 CONFIG = {
     "station_id": 175,
+    "project": "berliner-luft-dez",
     "gcs_bucket": os.getenv("GCS_BUCKET_NAME"),
     "bq_dataset": "airquality",
     "dimension_tables": ["components", "stations", "scopes"],

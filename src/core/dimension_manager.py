@@ -47,7 +47,7 @@ class DimensionManager:
         """Transform and load dimension data to BigQuery"""
         transformer = getattr(DataTransformer, f"transform_{entity}")
         rows = transformer(data)
-        # logging.info(f"Transformed rows: {rows}")  # Check field names
+        logging.info(f"Transformed rows: {rows}")  # Check field names
 
         if not rows:
             logging.warning(f"No rows to load for {entity}")

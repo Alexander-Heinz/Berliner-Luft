@@ -1,11 +1,7 @@
-# tests/test_api_client_integration.py
-import sys
-import os
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from services.api_client import LuftdatenAPIClient
+from core.data_transformer import DataTransformer
 import pytest
 from datetime import datetime
-from src.services.api_client import LuftdatenAPIClient
 
 
 @pytest.mark.integration
@@ -20,16 +16,19 @@ def test_get_stations_live_api_has_expected_schema():
     assert "data" in response
     assert "count" in response
 
-    # Test indices
+    # check if required columns are inside the dataset
     expected_columns = [
         "Id", "Code", "Name", "City", "Synonym",
         "Active from", "Active to", "Longitude", "Latitude",
         "Id of network", "Id of station setting", "Id of station type",
         "Network code", "Translated network name",
-        "Translated station setting name", "Translated station setting short name",
+        "Translated station setting name", 
+        "Translated station setting short name",
         "Translated station type name", "Street", "Street number"
     ]
-    indices_str = [i.split(" - ")[0].split(": ")[1] for i in response["indices"]]
+    indices_str = [i.split(" - ")[0].split(": ")[1] 
+                   for i in response["indices"]]
+    
     for col in expected_columns:
         assert col in indices_str, f"{col} not found in indices"
 
